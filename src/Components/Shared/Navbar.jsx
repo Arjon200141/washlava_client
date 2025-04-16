@@ -1,6 +1,21 @@
-import { NavLink } from "react-router-dom";
+import { useContext } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { AuthContext } from "../Providers/AuthProviders";
+import useCart from "../hooks/useCart";
+import useAdmin from "../hooks/useAdmin";
 
 const Navbar = () => {
+    const { user, loading, logOut } = useContext(AuthContext);
+    const [cart] = useCart();
+    const [isAdmin] = useAdmin();
+
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        });
+    };
+
     const navlinkStyles = ({ isActive }) => ({
         position: "relative",
         paddingBottom: "4px",
@@ -14,16 +29,25 @@ const Navbar = () => {
         }),
     });
 
+
+
     const links =
         <>
-            <NavLink to="/" style={navlinkStyles}>Home</NavLink>
-            <NavLink to="/about" style={navlinkStyles}>About us</NavLink>
-            <NavLink to="/services" style={navlinkStyles}>Services</NavLink>
-            <NavLink to="/contact" style={navlinkStyles}>Contact Us</NavLink>
+            <NavLink onClick={scrollToTop} to="/" style={navlinkStyles}>Home</NavLink>
+            <NavLink onClick={scrollToTop} to="/about" style={navlinkStyles}>About us</NavLink>
+            {!isAdmin && (
+                <NavLink onClick={scrollToTop} to="/services" style={navlinkStyles}>
+                    Services
+                </NavLink>
+            )}
+            {!isAdmin && (
+                <NavLink onClick={scrollToTop} to="/contact" style={navlinkStyles}>Contact Us</NavLink>
+            )}
         </>
+
     return (
-        <div>
-            <div className="navbar bg-[#9BB9FF] manrope px-5">
+        <div className="fixed z-10 w-full">
+            <div className="navbar bg-[#b9cdfd3a] manrope px-5">
                 <div className="navbar-start">
                     <div className="dropdown">
                         <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -46,14 +70,14 @@ const Navbar = () => {
                             {links}
                         </ul>
                     </div>
-                    <a className=" text-xl">
+                    <a className="text-xl">
                         <div className="flex items-center gap-3">
                             <div>
                                 <img src="https://i.ibb.co.com/9kwCqrfM/logo.jpg" alt="" className="h-20 rounded-full" />
                             </div>
                             <div className="">
                                 <h2 className="sansita text-[40px] mb-2">Washlava</h2>
-                                <h2 className="sansita text-[20px]">Laundry, as smooth as lava’s flow!</h2>
+                                <h2 className="sansita text-[20px]">Laundry, as smooth as lava's flow!</h2>
                             </div>
                         </div>
                     </a>
@@ -64,8 +88,34 @@ const Navbar = () => {
                     </ul>
                 </div>
                 <div className="navbar-end gap-8">
-                    <a className="btn bg-sky-400 text-xl font-medium py-4 px-6">Log In</a>
-                    <a className="btn bg-sky-400 text-xl font-medium py-4 px-6">Sign Up</a>
+                    {user ? (
+                        <Link to={user.isAdmin ? "/dashboard/adminHome" : "/dashboard/userHome"}>
+                            <button className="text-xl font-medium py-4 px-6">
+                                <img className="h-14 rounded-full border-2 border-white shadow-lg" src={user.photoURL} alt="" />
+                            </button>
+                        </Link>
+                    ) : (
+                        <>
+                            <Link to="/login">
+                                <a className="btn text-xl font-medium py-4 px-6 
+                                bg-gradient-to-r from-blue-500 to-blue-600 
+                                text-white hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700
+                                transition-all duration-300
+                                shadow-md hover:shadow-lg rounded-lg">
+                                    Log In
+                                </a>
+                            </Link>
+                            <Link to="/register">
+                                <a className="btn text-xl font-medium py-4 px-6 
+                                bg-gradient-to-r from-emerald-500 to-emerald-600 
+                                text-white hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-700
+                                transition-all duration-300
+                                shadow-md hover:shadow-lg rounded-lg">
+                                    Sign Up
+                                </a>
+                            </Link>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
